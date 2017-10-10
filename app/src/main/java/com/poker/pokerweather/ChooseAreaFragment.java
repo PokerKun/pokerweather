@@ -2,6 +2,7 @@ package com.poker.pokerweather;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.icu.util.ULocale;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.poker.pokerweather.db.City;
 import com.poker.pokerweather.db.County;
 import com.poker.pokerweather.db.Province;
+import com.poker.pokerweather.gson.Weather;
 import com.poker.pokerweather.util.HttpUtil;
 import com.poker.pokerweather.util.Utility;
 
@@ -91,6 +93,12 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", weatherId);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
