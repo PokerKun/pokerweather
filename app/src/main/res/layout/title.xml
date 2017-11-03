@@ -30,5 +30,5 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="15dp"
         android:textColor="#fff"
-        android:textSize="16sp"/>
+        android:textSize="20sp"/>
 </RelativeLayout>

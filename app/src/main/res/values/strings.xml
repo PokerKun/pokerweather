@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PokerWeather</string>
+    <string name="api_key">1e1e74a94599427b9d896379e5f2e27f</string>
+    <string name="city_api">http://guolin.tech/api/china</string>
+    <string name="bing_api">http://guolin.tech/api/bing_pic</string>
 </resources>

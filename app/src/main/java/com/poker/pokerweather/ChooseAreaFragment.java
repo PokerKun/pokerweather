@@ -3,10 +3,12 @@ package com.poker.pokerweather;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.icu.util.ULocale;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +55,8 @@ public class ChooseAreaFragment extends Fragment {
 
     private Button backButton;
 
+    private Button setButton;
+
     private ListView listView;
 
     private ArrayAdapter<String> adapter;
@@ -71,12 +75,15 @@ public class ChooseAreaFragment extends Fragment {
 
     private int currentLevel;
 
+    private SharedPreferences prefs;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.choose_area, container, false);
         titleText = (TextView)view.findViewById(R.id.title_text);
         backButton = (Button)view.findViewById(R.id.back_button);
+        setButton = (Button)view.findViewById(R.id.set_button);
         listView = (ListView)view.findViewById(R.id.list_view);
         adapter = new ArrayAdapter<>(getActivity(),android.R.layout.simple_list_item_1,dataList);
         listView.setAdapter(adapter);
@@ -86,6 +93,7 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -97,7 +105,7 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = countyList.get(position).getWeatherId();
-                    if(getActivity() instanceof MainActivity) {
+                    if (getActivity() instanceof MainActivity) {
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
                         intent.putExtra("weather_id", weatherId);
                         startActivity(intent);
@@ -107,6 +115,7 @@ public class ChooseAreaFragment extends Fragment {
                         activity.drawerLayout.closeDrawers();
                         activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
+                        queryProvinces();
                     }
                 }
             }
@@ -119,6 +128,13 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_CITY) {
                     queryProvinces();
                 }
+            }
+        });
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
             }
         });
         queryProvinces();
@@ -137,8 +153,11 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel = LEVEL_PROVINCE;
         } else {
-            String address = "http://guolin.tech/api/china";
-            queryFromServer(address, "province");
+            String cityApi = prefs.getString("edit_text_city_api",null);
+            if (cityApi == null) {
+                cityApi = "http://guolin.tech/api/china";
+            }
+            queryFromServer(cityApi, "province");
         }
     }
 
@@ -156,7 +175,11 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode;
+            String cityApi = prefs.getString("edit_text_city_api",null);
+            if (cityApi == null) {
+                cityApi = "http://guolin.tech/api/china";
+            }
+            String address = cityApi + "/" + provinceCode;
             queryFromServer(address, "city");
         }
     }
@@ -176,7 +199,11 @@ public class ChooseAreaFragment extends Fragment {
         } else {
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+            String cityApi = prefs.getString("edit_text_city_api",null);
+            if (cityApi == null) {
+                cityApi = "http://guolin.tech/api/china";
+            }
+            String address = cityApi + "/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
         }
     }
@@ -189,7 +216,7 @@ public class ChooseAreaFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        closeProgessDialog();
+                        closeProgressDialog();
                         Toast.makeText(getActivity(),"加载失败",Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -210,7 +237,7 @@ public class ChooseAreaFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            closeProgessDialog();
+                            closeProgressDialog();
                             if ("province".equals(type)) {
                                 queryProvinces();
                             } else if ("city".equals(type)) {
@@ -234,7 +261,7 @@ public class ChooseAreaFragment extends Fragment {
         progressDialog.show();
     }
 
-    private void closeProgessDialog() {
+    private void closeProgressDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }

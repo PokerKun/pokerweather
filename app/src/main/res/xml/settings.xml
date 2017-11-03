@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <PreferenceCategory android:title="常规设置">
+
+            <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="check_box_auto_weather"
+            android:title="天气自动更新" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="check_box_auto_bing"
+                android:title="背景自动更新" />
+
+            <ListPreference
+                android:defaultValue="2"
+                android:entries="@array/update_time"
+                android:entryValues="@array/update_time_values"
+                android:key="list_update_time"
+                android:title="自动更新间隔" />
+            <ListPreference
+                android:defaultValue="0"
+                android:entries="@array/temp_unit"
+                android:entryValues="@array/temp_unit_values"
+                android:key="list_temp_unit"
+                android:title="温度显示单位" />
+        </PreferenceCategory>
+    <PreferenceCategory android:title="高级设置">
+
+        <EditTextPreference
+            android:defaultValue="@string/api_key"
+            android:key="edit_text_api_key"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:title="彩云天气API Key" />
+        <EditTextPreference
+            android:defaultValue="@string/city_api"
+            android:key="edit_text_city_api"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:title="城市获取API" />
+        <EditTextPreference
+            android:defaultValue="@string/bing_api"
+            android:key="edit_text_bing_api"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:title="Bing每日一图获取API" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="关于信息">
+        <PreferenceScreen android:title="PokerWeather by Poker"
+            android:summary="Version 2.1.0"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

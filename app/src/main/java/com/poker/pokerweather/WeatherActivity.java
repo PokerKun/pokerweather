@@ -66,6 +66,8 @@ public class WeatherActivity extends AppCompatActivity {
 
     private Button navButton;
 
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,7 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         navButton = (Button)findViewById(R.id.nav_button);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather", null);
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
@@ -123,7 +125,11 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=1e1e74a94599427b9d896379e5f2e27f";
+        String apiKey = prefs.getString("edit_text_api_key",null);
+        if (apiKey == null) {
+            apiKey = "1e1e74a94599427b9d896379e5f2e27f";
+        }
+        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=" + apiKey;
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -161,7 +167,10 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void loadBingPic() {
-        String requestBingPic = "http://guolin.tech/api/bing_pic";
+        String requestBingPic = prefs.getString("edit_text_bing_api", null);
+        if (requestBingPic == null) {
+            requestBingPic = "http://guolin.tech/api/bing_pic";
+        }
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -187,7 +196,19 @@ public class WeatherActivity extends AppCompatActivity {
     private void showWeatherInfo(Weather weather) {
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
-        String degree = weather.now.temperature + "℃";
+        String degree = null;
+        String unit = prefs.getString("list_temp_unit", null);
+        if (unit != null) {
+            if (unit.equals("0")) {
+                degree = weather.now.temperature + "℃";
+            } else {
+                double temp = Double.parseDouble(weather.now.temperature);
+                double fah = temp * 33.8;
+                degree = (int)fah + "℉";
+            }
+        } else {
+            degree = weather.now.temperature + "℃";
+        }
         String weatherInfo = weather.now.more.info;
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);

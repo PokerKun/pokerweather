@@ -25,6 +25,10 @@
             android:name=".service.AutoUpdateService"
             android:enabled="true"
             android:exported="true" />
+
+        <activity android:name=".SettingsActivity"
+            android:label="设置"
+            android:theme="@style/AppThemeSettings" />
     </application>
 
 </manifest>
