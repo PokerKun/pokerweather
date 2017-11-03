@@ -49,7 +49,8 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="关于信息">
         <PreferenceScreen android:title="PokerWeather by Poker"
-            android:summary="Version 2.1.0"
+            android:key="about_version"
+            android:summary="Version"
             />
     </PreferenceCategory>
 </PreferenceScreen>
